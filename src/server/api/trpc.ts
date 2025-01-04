@@ -131,3 +131,25 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+/**
+ * Privileged (authenticated & moderator) procedure
+ *
+ * If you want a query or mutation to ONLY be accessible to logged in users that are moderators, use this. It verifies
+ * the session is valid and guarantees `ctx.session.user` is not null and `ctx.session.user.moderator` is true.
+ *
+ * @see https://trpc.io/docs/procedures
+ */
+export const privilegedModeratorProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    if (!ctx.session || !ctx.session.user || !ctx.session.user.isModerator) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    return next({
+      ctx: {
+        // infers the `session` as non-nullable
+        session: { ...ctx.session, user: ctx.session.user },
+      },
+    });
+  });
