@@ -30,6 +30,7 @@ export const playlistRouter = createTRPCRouter({
           game: input.game,
           reference: input.reference,
           title: input.title,
+          description: input.description,
           externalResource: input.externalResource,
           submittedBy: { connect: { id: ctx.session.user.id } },
         },

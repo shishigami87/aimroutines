@@ -52,6 +52,7 @@ export function CreatePlaylistForm() {
     resolver: zodResolver(createPlaylistSchema),
     defaultValues: {
       title: "",
+      description: "",
       author: "",
       authorHandle: "",
       game: Game.KOVAAKS,
