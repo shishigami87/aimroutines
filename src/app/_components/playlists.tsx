@@ -8,6 +8,7 @@ import {
   HeartIcon,
   HeartFilledIcon,
   TwitterLogoIcon,
+  InfoCircledIcon,
 } from "@radix-ui/react-icons";
 
 import { api } from "@/trpc/react";
@@ -15,6 +16,13 @@ import { Game, Playlist } from "@prisma/client";
 import { DataTable } from "@/components/ui/data-table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import { useToast } from "@/hooks/use-toast";
 import { capitalize } from "@/lib/utils";
 import { PlaylistWithLikes } from "@/shared/types/playlist";
@@ -84,6 +92,31 @@ export function Playlists({ user }: PlaylistsProps) {
     {
       accessorKey: "title",
       header: "Title",
+      cell: ({ row }) => {
+        const { title, description } = row.original;
+
+        if (!description) {
+          return title;
+        }
+
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="flex gap-2">
+                  <span>{title}</span>
+                  <div className="flex items-center justify-center p-0 text-gray-400">
+                    <InfoCircledIcon />
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-md font-medium">{description}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      },
     },
     {
       accessorKey: "author",
