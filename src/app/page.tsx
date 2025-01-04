@@ -25,7 +25,7 @@ export default async function Home() {
           <Playlists />
         </div>
         {/* Extra mobile-friendly */}
-        <div className="absolute bottom-0 z-50 flex h-[74px] w-full items-center justify-center">
+        <div className="absolute bottom-0 z-50 flex h-[74px] items-center justify-center">
           <div>
             Built by&nbsp;
             <Link
