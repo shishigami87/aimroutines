@@ -17,16 +17,25 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { capitalize } from "@/lib/utils";
+import { PlaylistWithLikes } from "@/shared/types/playlist";
 
 export function Playlists() {
-  const [playlists] = api.playlist.getAll.useSuspenseQuery({});
-
   const { toast } = useToast();
 
-  const columns: ColumnDef<Playlist>[] = [
+  const utils = api.useUtils();
+
+  const [playlists] = api.playlist.getAll.useSuspenseQuery({});
+
+  const toggleLike = api.playlist.toggleLike.useMutation({
+    onSuccess: async () => {
+      await utils.playlist.invalidate();
+    },
+  });
+
+  const columns: ColumnDef<PlaylistWithLikes>[] = [
     {
       accessorKey: "likes",
-      accessorFn: (playlist) => playlist._count.likedByUsers,
+      accessorFn: (playlist) => playlist.likes,
       header: "Likes",
     },
     {
@@ -37,9 +46,8 @@ export function Playlists() {
       accessorKey: "author",
       header: "Author",
       cell: ({ row }) => {
-        const author = row.getValue<Playlist["author"]>("author");
-        const authorHandle =
-          row.getValue<Playlist["authorHandle"]>("authorHandle");
+        const author = row.original.author;
+        const authorHandle = row.original.authorHandle;
 
         if (!author) {
           return "Unknown";
@@ -63,16 +71,11 @@ export function Playlists() {
       },
     },
     {
-      accessorKey: "authorHandle",
-      header: () => {},
-      cell: () => {},
-    },
-    {
       accessorKey: "reference",
       header: "Reference",
       cell: ({ row }) => {
-        const reference = row.getValue<Playlist["reference"]>("reference");
-        const game = row.getValue<Playlist["game"]>("game");
+        const reference = row.original.reference;
+        const game = row.original.game;
 
         if (game === Game.KOVAAKS) {
           return (
@@ -113,13 +116,13 @@ export function Playlists() {
     {
       accessorKey: "game",
       header: "Game",
-      cell: ({ cell }) => capitalize(cell.getValue<Playlist["game"]>()),
+      cell: ({ row }) => capitalize(row.original.game),
     },
     {
       accessorKey: "externalResource",
       header: "",
-      cell: ({ cell }) => {
-        const externalResource = cell.getValue<Playlist["externalResource"]>();
+      cell: ({ row }) => {
+        const externalResource = row.original.externalResource;
 
         if (externalResource) {
           return (
@@ -140,23 +143,22 @@ export function Playlists() {
       },
     },
     {
-      accessorKey: "liked",
-      header: () => {},
-      cell: () => {},
-    },
-    {
       accessorKey: "actions",
       header: "",
       cell: ({ row }) => {
-        const liked = row.getValue<boolean>("liked"); // TODO: type safety
-
-        console.log("liked", liked);
+        const liked = row.original.liked;
 
         return (
           <Button
             size="icon"
             variant="link"
             className="p-0 font-medium text-primary-foreground"
+            onClick={() => {
+              toggleLike.mutate({
+                playlistId: row.original.id,
+              });
+            }}
+            disabled={toggleLike.isPending}
           >
             {liked ? <HeartFilledIcon /> : <HeartIcon />}
           </Button>

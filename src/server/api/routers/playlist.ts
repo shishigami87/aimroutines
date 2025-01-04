@@ -8,6 +8,8 @@ import {
 } from "@/server/api/trpc";
 import { Game } from "@prisma/client";
 import { createPlaylistSchema } from "@/shared/schemas/playlist";
+import { auth } from "@/server/auth";
+import { TRPCError } from "@trpc/server";
 
 export const playlistRouter = createTRPCRouter({
   getAll: publicProcedure
@@ -34,7 +36,15 @@ export const playlistRouter = createTRPCRouter({
       if (userId) {
         const playlistsWithMyOwnLike = playlistsSortedByLikes.map(
           (playlist) => ({
-            ...playlist,
+            id: playlist.id,
+            title: playlist.title,
+            author: playlist.author,
+            authorHandle: playlist.authorHandle,
+            reference: playlist.reference,
+            description: playlist.description,
+            externalResource: playlist.externalResource,
+            game: playlist.game,
+            likes: playlist._count.likedByUsers,
             liked: playlist.likedByUsers.find(
               (likedByUser) => likedByUser.userId === userId,
             )
@@ -47,7 +57,15 @@ export const playlistRouter = createTRPCRouter({
       }
 
       return playlistsSortedByLikes.map((playlist) => ({
-        ...playlist,
+        id: playlist.id,
+        title: playlist.title,
+        author: playlist.author,
+        authorHandle: playlist.authorHandle,
+        reference: playlist.reference,
+        description: playlist.description,
+        externalResource: playlist.externalResource,
+        game: playlist.game,
+        likes: playlist._count.likedByUsers,
         liked: false,
       }));
     }),
@@ -67,5 +85,46 @@ export const playlistRouter = createTRPCRouter({
           submittedBy: { connect: { id: ctx.session.user.id } },
         },
       });
+    }),
+  toggleLike: protectedProcedure
+    .input(z.object({ playlistId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const { playlistId } = input;
+
+      // Does this playlist exist?
+      const playlist = await ctx.db.playlist.findUnique({
+        where: {
+          id: playlistId,
+        },
+        include: {
+          likedByUsers: true,
+        },
+      });
+
+      if (!playlist) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      // Did we already like it?
+      const likedByUser = playlist.likedByUsers.find(
+        (likedByUser) => likedByUser.userId === userId,
+      );
+
+      // If we already liked it, remove the like. Otherwise, add it.
+      if (likedByUser) {
+        await ctx.db.playlistLiked.delete({
+          where: {
+            playlistId_userId: { playlistId, userId },
+          },
+        });
+      } else {
+        await ctx.db.playlistLiked.create({
+          data: {
+            user: { connect: { id: userId } },
+            playlist: { connect: { id: playlistId } },
+          },
+        });
+      }
     }),
 });
