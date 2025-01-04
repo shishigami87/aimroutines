@@ -21,6 +21,11 @@ export default async function Home() {
   return (
     <HydrateClient>
       <main className="flex min-h-screen flex-col items-center bg-zinc-950 text-white">
+        <div className="absolute left-8 top-8">
+          <h1 className="text-4xl font-extrabold tracking-tight">
+            AimRoutines.fyi
+          </h1>
+        </div>
         <div className="flex flex-1 items-center justify-center">
           <Playlists />
         </div>

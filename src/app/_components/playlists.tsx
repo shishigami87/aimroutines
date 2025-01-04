@@ -37,6 +37,44 @@ export function Playlists() {
       accessorKey: "likes",
       accessorFn: (playlist) => playlist.likes,
       header: "Likes",
+      cell: ({ row }) => (
+        <div className="text-center font-medium">{row.original.likes}</div>
+      ),
+    },
+    {
+      accessorKey: "actionsPlay",
+      header: "",
+      cell: ({ row }) => {
+        const reference = row.original.reference;
+        const game = row.original.game;
+
+        if (game === Game.KOVAAKS) {
+          return (
+            <Button
+              variant="link"
+              className="p-0 font-medium text-primary-foreground"
+            >
+              <Link
+                href={`steam://run/824270/?action=jump-to-playlist;sharecode=${reference}`}
+                target="_blank"
+              >
+                <PlayIcon />
+              </Link>
+            </Button>
+          );
+        }
+
+        return (
+          <Button
+            variant="link"
+            className="p-0 font-medium text-primary-foreground"
+          >
+            <Link href={reference} target="_blank">
+              <PlayIcon />
+            </Link>
+          </Button>
+        );
+      },
     },
     {
       accessorKey: "title",
@@ -72,7 +110,7 @@ export function Playlists() {
     },
     {
       accessorKey: "reference",
-      header: "Reference",
+      header: "Share code",
       cell: ({ row }) => {
         const reference = row.original.reference;
         const game = row.original.game;
@@ -95,22 +133,7 @@ export function Playlists() {
           );
         }
 
-        return (
-          <Button
-            asChild
-            variant="link"
-            className="p-0 font-medium text-primary-foreground"
-            onClick={() => {
-              toast({
-                description: "Sharecode copied to clipboard",
-              });
-            }}
-          >
-            <Link href={reference} target="_blank">
-              Open in Aimlabs <PlayIcon />
-            </Link>
-          </Button>
-        );
+        return "N/A";
       },
     },
     {
@@ -143,9 +166,11 @@ export function Playlists() {
       },
     },
     {
-      accessorKey: "actions",
+      accessorKey: "actionsLike",
       header: "",
       cell: ({ row }) => {
+        // TODO: Fix hydration error
+        // TODO: Dont show like button if user is not logged in
         const liked = row.original.liked;
 
         return (

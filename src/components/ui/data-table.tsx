@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useLayoutEffect } from "react";
 
 import {
   ColumnDef,
@@ -34,6 +34,15 @@ export function DataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Prevents hydration error
+  useLayoutEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
 
   return (
     <div className="rounded-md border">
