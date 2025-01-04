@@ -27,7 +27,7 @@ export default async function Home() {
           </h1>
         </div>
         <div className="flex flex-1 items-center justify-center">
-          <Playlists />
+          <Playlists user={session?.user} />
         </div>
         {/* Extra mobile-friendly */}
         <div className="absolute bottom-0 z-50 flex h-[74px] items-center justify-center">

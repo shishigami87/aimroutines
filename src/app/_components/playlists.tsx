@@ -18,8 +18,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { capitalize } from "@/lib/utils";
 import { PlaylistWithLikes } from "@/shared/types/playlist";
+import { User } from "next-auth";
 
-export function Playlists() {
+type PlaylistsProps = {
+  user: User | null | undefined;
+};
+
+export function Playlists({ user }: PlaylistsProps) {
   const { toast } = useToast();
 
   const utils = api.useUtils();
@@ -169,8 +174,10 @@ export function Playlists() {
       accessorKey: "actionsLike",
       header: "",
       cell: ({ row }) => {
-        // TODO: Fix hydration error
-        // TODO: Dont show like button if user is not logged in
+        if (!user) {
+          return "";
+        }
+
         const liked = row.original.liked;
 
         return (
