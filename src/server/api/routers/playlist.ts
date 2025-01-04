@@ -26,6 +26,9 @@ export const playlistRouter = createTRPCRouter({
           },
           likedByUsers: true,
         },
+        orderBy: {
+          title: "desc",
+        },
       });
 
       // TODO: Extremely high performance code
