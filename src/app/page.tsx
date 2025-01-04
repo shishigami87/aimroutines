@@ -21,16 +21,16 @@ export default async function Home() {
   return (
     <HydrateClient>
       <main className="flex min-h-screen flex-col items-center bg-zinc-950 text-white">
-        <div className="absolute left-8 top-8">
+        <div className="w-full p-8">
           <h1 className="text-4xl font-extrabold tracking-tight">
             AimRoutines.fyi
           </h1>
         </div>
-        <div className="flex flex-1 items-center justify-center">
+        <div className="mb-[calc(74px+2rem)] flex flex-1 items-center justify-center">
           <Playlists user={session?.user} />
         </div>
         {/* Extra mobile-friendly */}
-        <div className="absolute bottom-0 z-50 flex h-[74px] items-center justify-center">
+        <div className="fixed bottom-0 z-50 flex h-[74px] items-center justify-center">
           <div>
             Built by&nbsp;
             <Link
@@ -42,7 +42,7 @@ export default async function Home() {
             </Link>
           </div>
         </div>
-        <div className="absolute bottom-0 flex w-full border-t-2 border-primary p-4">
+        <div className="fixed bottom-0 flex w-full border-t-2 border-primary bg-zinc-950 p-4">
           {session ? (
             <div className="flex items-center gap-2">
               <Avatar>
