@@ -125,8 +125,8 @@ export function Playlists({ user }: PlaylistsProps) {
             <Button
               variant="link"
               className="p-0 font-medium text-primary-foreground"
-              onClick={() => {
-                navigator.clipboard.writeText(reference);
+              onClick={async () => {
+                await navigator.clipboard.writeText(reference);
                 toast({
                   description: "Sharecode copied to clipboard",
                 });
