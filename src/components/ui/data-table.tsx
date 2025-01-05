@@ -4,10 +4,10 @@ import { useState, useLayoutEffect } from "react";
 
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -29,10 +29,17 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
   });
 
   const [isMounted, setIsMounted] = useState(false);
@@ -49,7 +56,7 @@ export function DataTable<TData, TValue>({
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} className="hover:bg-inherit">
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead key={header.id}>
@@ -71,6 +78,7 @@ export function DataTable<TData, TValue>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className="hover:bg-zinc-900"
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

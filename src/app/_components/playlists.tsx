@@ -10,6 +10,7 @@ import {
   TwitterLogoIcon,
   InfoCircledIcon,
 } from "@radix-ui/react-icons";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 import { api } from "@/trpc/react";
 import { Game, Playlist } from "@prisma/client";
@@ -49,7 +50,28 @@ export function Playlists({ user }: PlaylistsProps) {
     {
       accessorKey: "likes",
       accessorFn: (playlist) => playlist.likes,
-      header: "Likes",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+
+        let SortIcon = ArrowUpDown;
+
+        if (isSorted === "asc") {
+          SortIcon = ArrowUp;
+        } else if (isSorted === "desc") {
+          SortIcon = ArrowDown;
+        }
+
+        return (
+          <Button
+            variant="link"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 text-muted-foreground"
+          >
+            Likes
+            <SortIcon />
+          </Button>
+        );
+      },
       cell: ({ row }) => (
         <div className="text-center font-medium">{row.original.likes}</div>
       ),
@@ -91,7 +113,28 @@ export function Playlists({ user }: PlaylistsProps) {
     },
     {
       accessorKey: "title",
-      header: "Title",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+
+        let SortIcon = ArrowUpDown;
+
+        if (isSorted === "asc") {
+          SortIcon = ArrowUp;
+        } else if (isSorted === "desc") {
+          SortIcon = ArrowDown;
+        }
+
+        return (
+          <Button
+            variant="link"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 text-muted-foreground"
+          >
+            Title
+            <SortIcon />
+          </Button>
+        );
+      },
       cell: ({ row }) => {
         const { title, description } = row.original;
 
@@ -120,7 +163,28 @@ export function Playlists({ user }: PlaylistsProps) {
     },
     {
       accessorKey: "author",
-      header: "Author",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+
+        let SortIcon = ArrowUpDown;
+
+        if (isSorted === "asc") {
+          SortIcon = ArrowUp;
+        } else if (isSorted === "desc") {
+          SortIcon = ArrowDown;
+        }
+
+        return (
+          <Button
+            variant="link"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 text-muted-foreground"
+          >
+            Author
+            <SortIcon />
+          </Button>
+        );
+      },
       cell: ({ row }) => {
         const author = row.original.author;
         const authorHandle = row.original.authorHandle;
@@ -176,7 +240,28 @@ export function Playlists({ user }: PlaylistsProps) {
     },
     {
       accessorKey: "game",
-      header: "Game",
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted();
+
+        let SortIcon = ArrowUpDown;
+
+        if (isSorted === "asc") {
+          SortIcon = ArrowUp;
+        } else if (isSorted === "desc") {
+          SortIcon = ArrowDown;
+        }
+
+        return (
+          <Button
+            variant="link"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="p-0 text-muted-foreground"
+          >
+            Game
+            <SortIcon />
+          </Button>
+        );
+      },
       cell: ({ row }) => capitalize(row.original.game),
     },
     {
