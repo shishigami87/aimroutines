@@ -45,7 +45,7 @@ export function DataTable<TData, TValue>({
   if (!isMounted) return null;
 
   return (
-    <div className="rounded-md border">
+    <div className="max-h-[calc(100vh-212px)] overflow-y-auto rounded-md border">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
