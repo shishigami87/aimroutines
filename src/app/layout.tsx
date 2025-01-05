@@ -6,8 +6,8 @@ import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata: Metadata = {
-  title: "Aimroutines",
-  description: "todo",
+  title: "AimRoutines",
+  description: "Find the best aim training routines for your favorite games.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
