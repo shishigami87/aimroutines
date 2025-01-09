@@ -30,9 +30,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Game } from "@prisma/client";
 
@@ -63,12 +63,34 @@ export function CreateRoutineForm() {
     },
   });
 
+  const { fields, append, remove } = useFieldArray({
+    name: "playlists",
+    control: form.control,
+  });
+
   const createRoutine = api.routine.create.useMutation({
     onSuccess: async (data) => {
       await utils.routine.invalidate();
       setSubmitDialogOpen(false);
+      form.reset();
+      toast({
+        title: "All done!",
+        description: "Your routine has been submitted.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "An error occurred",
+        description: error.message,
+        variant: "destructive",
+        duration: 30000,
+      });
     },
   });
+
+  function onSubmit(values: z.infer<typeof createRoutineSchema>) {
+    createRoutine.mutate(values);
+  }
 
   return (
     <>
@@ -83,7 +105,10 @@ export function CreateRoutineForm() {
         </Button>
       </div>
       <Sheet open={submitDialogOpen} onOpenChange={setSubmitDialogOpen}>
-        <SheetContent onInteractOutside={(event) => event.preventDefault()}>
+        <SheetContent
+          onInteractOutside={(event) => event.preventDefault()}
+          className="flex min-w-[500px] flex-col overflow-auto"
+        >
           <SheetHeader className="mb-4">
             <SheetTitle>Submit new routine</SheetTitle>
             <SheetDescription>
@@ -92,17 +117,7 @@ export function CreateRoutineForm() {
           </SheetHeader>
 
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit((data) => {
-                createRoutine.mutate(data);
-                toast({
-                  title: "All done!",
-                  description: "The routine has been submitted.",
-                });
-                form.reset();
-              })}
-              className="space-y-2"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
               <FormField
                 control={form.control}
                 name="game"
@@ -129,7 +144,6 @@ export function CreateRoutineForm() {
                     <FormDescription>
                       The game for which this routine was created
                     </FormDescription>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -143,7 +157,6 @@ export function CreateRoutineForm() {
                       <Input placeholder="Enter title" {...field} />
                     </FormControl>
                     <FormDescription>The title of this routine</FormDescription>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -163,7 +176,6 @@ export function CreateRoutineForm() {
                     <FormDescription>
                       Additional information about this routine
                     </FormDescription>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -179,7 +191,6 @@ export function CreateRoutineForm() {
                     <FormDescription>
                       The original author of this routine
                     </FormDescription>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -198,32 +209,6 @@ export function CreateRoutineForm() {
                     <FormDescription>
                       The twitter handle of the original author of this routine
                     </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="playlists.0.reference"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reference *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={
-                          form.getValues().game === Game.KOVAAKS
-                            ? "Enter share code"
-                            : "Enter routine URL"
-                        }
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {form.getValues().game === Game.KOVAAKS
-                        ? "The share code to add this routine in Kovaaks"
-                        : "The URL to open this routine in Aimlabs"}
-                    </FormDescription>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -239,15 +224,87 @@ export function CreateRoutineForm() {
                     <FormDescription>
                       Any external resources the routine may have
                     </FormDescription>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
+              <div className="py-2">
+                <p className="text-md mb-4 font-semibold">
+                  Configure playlist(s) *
+                </p>
+                {fields.length === 0 && (
+                  <p className="mb-2 text-sm text-muted-foreground">
+                    You must add at least one playlist
+                  </p>
+                )}
+                {fields.map((playlist, index) => (
+                  <div key={playlist.id} className="my-2 flex gap-2">
+                    <FormField
+                      control={form.control}
+                      name={`playlists.${index}.title`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Title *</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter title" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            For example "Bronze" or "Silver"
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`playlists.${index}.reference`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Reference *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={
+                                form.getValues().game === Game.KOVAAKS
+                                  ? "Enter share code"
+                                  : "Enter URL"
+                              }
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {form.getValues().game === Game.KOVAAKS
+                              ? "The share code to add this routine in Kovaaks"
+                              : "The URL to open this routine in Aimlabs"}
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex pt-[32px]">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          remove(index);
+                        }}
+                      >
+                        <TrashIcon />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  className="mt-2"
+                  onClick={() => {
+                    append({ title: "", reference: "" });
+                  }}
+                >
+                  <PlusIcon /> Add playlist
+                </Button>
+              </div>
               <FormField
                 control={form.control}
                 name="isBenchmark"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 py-4">
                     <FormControl>
                       <Checkbox
                         checked={field.value}
@@ -257,18 +314,23 @@ export function CreateRoutineForm() {
                     <div className="space-y-1 leading-none">
                       <FormLabel>This is a benchmark</FormLabel>
                       <FormDescription>
-                        Users can add their own benchmark sheets to this
-                        routine.
+                        Users can add their own score sheets to this routine.
                       </FormDescription>
                     </div>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
 
               <SheetFooter className="mt-4">
                 <SheetClose asChild>
-                  <Button type="submit" disabled={createRoutine.isPending}>
+                  <Button
+                    type="submit"
+                    disabled={
+                      createRoutine.isPending ||
+                      !form.formState.isDirty ||
+                      !form.formState.isValid
+                    }
+                  >
                     {createRoutine.isPending ? "Submitting..." : "Submit"}
                   </Button>
                 </SheetClose>
