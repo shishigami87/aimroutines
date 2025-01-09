@@ -1,16 +1,18 @@
-import { Routine } from "@prisma/client";
+import { Playlist, Routine } from "@prisma/client";
 
-export type RoutineWithLikes = Pick<
+export type RoutineData = Pick<
   Routine,
   | "id"
   | "title"
   | "author"
   | "authorHandle"
-  | "reference"
   | "description"
   | "externalResource"
   | "game"
+  | "isBenchmark"
 > & {
   likes: number;
   liked: boolean;
+  playlists: Playlist[];
+  benchmarkSheet?: string;
 };

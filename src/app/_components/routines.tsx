@@ -1,9 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
-  OpenInNewWindowIcon,
-  CopyIcon,
   PlayIcon,
   HeartIcon,
   HeartFilledIcon,
@@ -13,7 +12,7 @@ import {
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 import { api } from "@/trpc/react";
-import { Game, Routine } from "@prisma/client";
+import { Game, Playlist, Routine } from "@prisma/client";
 import { DataTable } from "@/components/ui/data-table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -23,11 +22,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+} from "@/components/ui/dropdown-menu";
 
 import { useToast } from "@/hooks/use-toast";
-import { capitalize } from "@/lib/utils";
-import { RoutineWithLikes } from "@/shared/types/routine";
+import { capitalize, getPlayButtonUri } from "@/lib/utils";
+import { RoutineData } from "@/shared/types/routine";
 import { User } from "next-auth";
+import { RoutineTableActions } from "./routineTableActions";
+import { Strategy } from "@/lib/constants";
 
 type RoutinesProps = {
   user: User | null | undefined;
@@ -38,7 +48,11 @@ export function Routines({ user }: RoutinesProps) {
 
   const utils = api.useUtils();
 
-  const [routines] = api.routine.getAll.useSuspenseQuery({});
+  const [strategy, setStrategy] = useState<Strategy>("all-routines");
+
+  const [routines] = api.routine.getRoutines.useSuspenseQuery({
+    strategy,
+  });
 
   const toggleLike = api.routine.toggleLike.useMutation({
     onSuccess: async () => {
@@ -46,7 +60,7 @@ export function Routines({ user }: RoutinesProps) {
     },
   });
 
-  const columns: ColumnDef<RoutineWithLikes>[] = [
+  const columns: ColumnDef<RoutineData>[] = [
     {
       accessorKey: "likes",
       accessorFn: (routine) => routine.likes,
@@ -80,31 +94,56 @@ export function Routines({ user }: RoutinesProps) {
       accessorKey: "actionsPlay",
       header: "",
       cell: ({ row }) => {
-        const reference = row.original.reference;
+        const playlists = row.original.playlists;
         const game = row.original.game;
 
-        if (game === Game.KOVAAKS) {
+        if (playlists.length < 1) {
+          return "";
+        }
+
+        if (playlists.length > 1) {
           return (
-            <Button
-              variant="link"
-              className="p-0 font-medium text-primary-foreground"
-            >
-              <Link
-                href={`steam://run/824270/?action=jump-to-playlist;sharecode=${reference}`}
-                target="_blank"
-              >
-                <PlayIcon />
-              </Link>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="link"
+                  className="p-0 font-medium text-primary-foreground"
+                >
+                  <span className="sr-only">Open menu</span>
+                  <PlayIcon />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="right">
+                <DropdownMenuLabel>Start playlist</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  {playlists.map((playlist) => (
+                    <DropdownMenuItem key={playlist.title} asChild>
+                      <Link
+                        href={getPlayButtonUri(playlist.reference, game)}
+                        target="_blank"
+                      >
+                        {playlist.title}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           );
         }
+
+        const firstPlaylist = playlists.at(0) as Playlist;
 
         return (
           <Button
             variant="link"
             className="p-0 font-medium text-primary-foreground"
           >
-            <Link href={reference} target="_blank">
+            <Link
+              href={getPlayButtonUri(firstPlaylist.reference, game)}
+              target="_blank"
+            >
               <PlayIcon />
             </Link>
           </Button>
@@ -113,6 +152,16 @@ export function Routines({ user }: RoutinesProps) {
     },
     {
       accessorKey: "title",
+      filterFn: (row, columnId, filterValue) => {
+        const query = filterValue.toLowerCase();
+        const title = row.original.title.toLowerCase();
+        const shareCodes = row.original.playlists
+          .map((playlist) => playlist.reference)
+          .join()
+          .toLowerCase();
+
+        return title.includes(query) || shareCodes.includes(query);
+      },
       header: ({ column }) => {
         const isSorted = column.getIsSorted();
 
@@ -211,34 +260,6 @@ export function Routines({ user }: RoutinesProps) {
       },
     },
     {
-      accessorKey: "reference",
-      header: "Share code",
-      cell: ({ row }) => {
-        const reference = row.original.reference;
-        const game = row.original.game;
-
-        if (game === Game.KOVAAKS) {
-          return (
-            <Button
-              variant="link"
-              className="p-0 font-medium text-primary-foreground"
-              onClick={async () => {
-                await navigator.clipboard.writeText(reference);
-                toast({
-                  description: "Sharecode copied to clipboard",
-                });
-              }}
-            >
-              {reference}
-              <CopyIcon />
-            </Button>
-          );
-        }
-
-        return "N/A";
-      },
-    },
-    {
       accessorKey: "game",
       header: ({ column }) => {
         const isSorted = column.getIsSorted();
@@ -263,30 +284,6 @@ export function Routines({ user }: RoutinesProps) {
         );
       },
       cell: ({ row }) => capitalize(row.original.game),
-    },
-    {
-      accessorKey: "externalResource",
-      header: "",
-      cell: ({ row }) => {
-        const externalResource = row.original.externalResource;
-
-        if (externalResource) {
-          return (
-            <Button
-              asChild
-              variant="link"
-              size="icon"
-              className="p-0 font-medium text-primary-foreground"
-            >
-              <Link href={externalResource} target="_blank">
-                <OpenInNewWindowIcon />
-              </Link>
-            </Button>
-          );
-        }
-
-        return "";
-      },
     },
     {
       accessorKey: "actionsLike",
@@ -315,12 +312,26 @@ export function Routines({ user }: RoutinesProps) {
         );
       },
     },
+    {
+      accessorKey: "actions",
+      header: "",
+      cell: ({ row }) => {
+        return <RoutineTableActions routine={row.original} user={user} />;
+      },
+    },
   ];
 
   return (
-    <div className="w-full max-w-7xl">
+    <div className="w-full max-w-4xl">
       {routines ? (
-        <DataTable columns={columns} data={routines} />
+        <DataTable
+          columns={columns}
+          data={routines}
+          onStrategyChange={(newStrategy) => {
+            setStrategy(newStrategy);
+          }}
+          user={user}
+        />
       ) : (
         <p>There are no routines yet.</p>
       )}

@@ -55,7 +55,8 @@ model User {
 
     submittedRoutines Routine[] @relation(name: "RoutineSubmittedBy")
 
-    likedRoutines RoutineLiked[]
+    likedRoutines       RoutineLiked[]
+    benchmarkedRoutines RoutineBenchmark[]
 }
 
 model VerificationToken {
@@ -71,18 +72,21 @@ model VerificationToken {
 model Routine {
     id String @id @default(cuid())
 
-    reference        String  @unique // e.g. sharecode for Kovaaks or URL for Aimlabs
     title            String  @unique
     description      String?
     author           String?
     authorHandle     String?
     externalResource String?
+    isBenchmark      Boolean @default(false)
     game             Game
+
+    playlist Playlist[]
 
     submittedBy   User   @relation(name: "RoutineSubmittedBy", fields: [submittedById], references: [id])
     submittedById String
 
-    likedByUsers RoutineLiked[]
+    likedByUsers       RoutineLiked[]
+    benchmarkedByUsers RoutineBenchmark[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -99,6 +103,32 @@ model RoutineLiked {
     updatedAt DateTime @updatedAt
 
     @@id([routineId, userId])
+}
+
+model RoutineBenchmark {
+    url String
+
+    routine   Routine @relation(fields: [routineId], references: [id])
+    routineId String
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@id([routineId, userId])
+}
+
+model Playlist {
+    title String @default("Normal")
+
+    reference String @unique
+
+    routine   Routine @relation(fields: [routineId], references: [id])
+    routineId String
+
+    @@id([title, routineId])
 }
 
 enum Game {

@@ -7,6 +7,12 @@ export const createRoutineSchema = z.object({
   author: z.string().max(64).optional(),
   authorHandle: z.string().max(32).optional(),
   game: z.nativeEnum(Game),
-  reference: z.string().min(8).max(256),
   externalResource: z.string().max(256).optional(),
+  isBenchmark: z.boolean(),
+  playlists: z.array(
+    z.object({
+      title: z.string().max(64),
+      reference: z.string().min(8).max(256),
+    }),
+  ),
 });

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useLayoutEffect } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import { User } from "next-auth";
 
 import {
   ColumnDef,
@@ -12,7 +14,6 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -27,17 +28,23 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
 } from "@/components/ui/select";
 import { Input } from "./input";
+import { Strategy } from "@/lib/constants";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  user: User | null | undefined;
+  onStrategyChange?: (newStrategy: Strategy) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  user,
+  onStrategyChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -58,6 +65,10 @@ export function DataTable<TData, TValue>({
 
   const [isMounted, setIsMounted] = useState(false);
 
+  const debouncedOnChange = useDebouncedCallback((value) => {
+    table.getColumn("title")?.setFilterValue(value);
+  }, 200);
+
   // Prevents hydration error
   useLayoutEffect(() => {
     setIsMounted(true);
@@ -70,11 +81,8 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center gap-2 pb-4">
         <Input
           autoComplete="off"
-          placeholder="Filter by title"
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
+          placeholder="Filter by title or share code"
+          onChange={(event) => debouncedOnChange(event.target.value)}
           className="max-w-sm"
         />
         <Select
@@ -93,6 +101,30 @@ export function DataTable<TData, TValue>({
             <SelectItem value="ANY">--- Any ---</SelectItem>
             <SelectItem value="KOVAAKS">Kovaaks</SelectItem>
             <SelectItem value="AIMLABS">Aimlabs</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="flex-1"></div>
+        <Select
+          defaultValue="all-routines"
+          onValueChange={(value) => {
+            onStrategyChange?.(value as Strategy);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all-routines">All routines</SelectItem>
+            {user && (
+              <SelectItem value="liked-routines">Liked routines</SelectItem>
+            )}
+            <SelectItem value="only-benchmarks">Only benchmarks</SelectItem>
+            {user && (
+              <SelectItem value="active-benchmarks">
+                Active benchmarks
+              </SelectItem>
+            )}
+            <SelectItem value="no-benchmarks">No benchmarks</SelectItem>
           </SelectContent>
         </Select>
       </div>

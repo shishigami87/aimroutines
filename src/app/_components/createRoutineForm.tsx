@@ -40,6 +40,7 @@ import { api } from "@/trpc/react";
 import { capitalize } from "@/lib/utils";
 import { createRoutineSchema } from "@/shared/schemas/routine";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function CreateRoutineForm() {
   const utils = api.useUtils();
@@ -56,8 +57,9 @@ export function CreateRoutineForm() {
       author: "",
       authorHandle: "",
       game: Game.KOVAAKS,
-      reference: "",
+      playlists: [],
       externalResource: "",
+      isBenchmark: false,
     },
   });
 
@@ -202,7 +204,7 @@ export function CreateRoutineForm() {
               />
               <FormField
                 control={form.control}
-                name="reference"
+                name="playlists.0.reference"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Reference *</FormLabel>
@@ -237,6 +239,28 @@ export function CreateRoutineForm() {
                     <FormDescription>
                       Any external resources the routine may have
                     </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isBenchmark"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>This is a benchmark</FormLabel>
+                      <FormDescription>
+                        Users can add their own benchmark sheets to this
+                        routine.
+                      </FormDescription>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}

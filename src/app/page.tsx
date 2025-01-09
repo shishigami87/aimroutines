@@ -26,7 +26,7 @@ export default async function Home() {
             AimRoutines.fyi
           </h1>
         </div>
-        <div className="mb-[calc(74px+2rem)] flex flex-1 items-center justify-center">
+        <div className="mb-[calc(74px+2rem)] flex w-full max-w-4xl flex-1 items-center justify-center">
           <Routines user={session?.user} />
         </div>
         {/* Extra mobile-friendly */}
