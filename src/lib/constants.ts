@@ -8,6 +8,7 @@
 
 export const Strategies = {
   ["all-routines"]: "All routines",
+  ["recommend-beginners"]: "Beginner routines",
   ["liked-routines"]: "Liked routines",
   ["only-benchmarks"]: "Only benchmarks",
   ["active-benchmarks"]: "Active benchmarks",

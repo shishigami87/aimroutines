@@ -118,6 +118,9 @@ export function DataTable<TData, TValue>({
             {user && (
               <SelectItem value="liked-routines">Liked routines</SelectItem>
             )}
+            <SelectItem value="recommend-beginners">
+              Beginner routines
+            </SelectItem>
             <SelectItem value="only-benchmarks">Only benchmarks</SelectItem>
             {user && (
               <SelectItem value="active-benchmarks">
