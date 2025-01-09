@@ -38,18 +38,18 @@ import { Game } from "@prisma/client";
 
 import { api } from "@/trpc/react";
 import { capitalize } from "@/lib/utils";
-import { createPlaylistSchema } from "@/shared/schemas/playlist";
+import { createRoutineSchema } from "@/shared/schemas/routine";
 import { Textarea } from "@/components/ui/textarea";
 
-export function CreatePlaylistForm() {
+export function CreateRoutineForm() {
   const utils = api.useUtils();
 
   const { toast } = useToast();
 
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof createPlaylistSchema>>({
-    resolver: zodResolver(createPlaylistSchema),
+  const form = useForm<z.infer<typeof createRoutineSchema>>({
+    resolver: zodResolver(createRoutineSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -61,9 +61,9 @@ export function CreatePlaylistForm() {
     },
   });
 
-  const createPlaylist = api.playlist.create.useMutation({
+  const createRoutine = api.routine.create.useMutation({
     onSuccess: async (data) => {
-      await utils.playlist.invalidate();
+      await utils.routine.invalidate();
       setSubmitDialogOpen(false);
     },
   });
@@ -77,25 +77,25 @@ export function CreatePlaylistForm() {
           onClick={() => setSubmitDialogOpen(true)}
         >
           <PlusIcon />
-          Submit new playlist
+          Submit new routine
         </Button>
       </div>
       <Sheet open={submitDialogOpen} onOpenChange={setSubmitDialogOpen}>
         <SheetContent onInteractOutside={(event) => event.preventDefault()}>
           <SheetHeader className="mb-4">
-            <SheetTitle>Submit new playlist</SheetTitle>
+            <SheetTitle>Submit new routine</SheetTitle>
             <SheetDescription>
-              This will submit a new playlist that others can see and vote on.
+              This will submit a new routine that others can see and vote on.
             </SheetDescription>
           </SheetHeader>
 
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit((data) => {
-                createPlaylist.mutate(data);
+                createRoutine.mutate(data);
                 toast({
                   title: "All done!",
-                  description: "The playlist has been submitted.",
+                  description: "The routine has been submitted.",
                 });
                 form.reset();
               })}
@@ -125,7 +125,7 @@ export function CreatePlaylistForm() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      The game for which this playlist was created
+                      The game for which this routine was created
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -140,9 +140,7 @@ export function CreatePlaylistForm() {
                     <FormControl>
                       <Input placeholder="Enter title" {...field} />
                     </FormControl>
-                    <FormDescription>
-                      The title of this playlist
-                    </FormDescription>
+                    <FormDescription>The title of this routine</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -161,7 +159,7 @@ export function CreatePlaylistForm() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Additional information about this playlist
+                      Additional information about this routine
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -177,7 +175,7 @@ export function CreatePlaylistForm() {
                       <Input placeholder="Enter author" {...field} />
                     </FormControl>
                     <FormDescription>
-                      The original author of this playlist
+                      The original author of this routine
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -196,7 +194,7 @@ export function CreatePlaylistForm() {
                       />
                     </FormControl>
                     <FormDescription>
-                      The twitter handle of the original author of this playlist
+                      The twitter handle of the original author of this routine
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -213,15 +211,15 @@ export function CreatePlaylistForm() {
                         placeholder={
                           form.getValues().game === Game.KOVAAKS
                             ? "Enter share code"
-                            : "Enter playlist URL"
+                            : "Enter routine URL"
                         }
                         {...field}
                       />
                     </FormControl>
                     <FormDescription>
                       {form.getValues().game === Game.KOVAAKS
-                        ? "The share code to add this playlist in Kovaaks"
-                        : "The URL to open this playlist in Aimlabs"}
+                        ? "The share code to add this routine in Kovaaks"
+                        : "The URL to open this routine in Aimlabs"}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -237,7 +235,7 @@ export function CreatePlaylistForm() {
                       <Input placeholder="Enter URL" {...field} />
                     </FormControl>
                     <FormDescription>
-                      Any external resources the playlist may have
+                      Any external resources the routine may have
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -246,8 +244,8 @@ export function CreatePlaylistForm() {
 
               <SheetFooter className="mt-4">
                 <SheetClose asChild>
-                  <Button type="submit" disabled={createPlaylist.isPending}>
-                    {createPlaylist.isPending ? "Submitting..." : "Submit"}
+                  <Button type="submit" disabled={createRoutine.isPending}>
+                    {createRoutine.isPending ? "Submitting..." : "Submit"}
                   </Button>
                 </SheetClose>
               </SheetFooter>

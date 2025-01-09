@@ -7,17 +7,17 @@ import {
   publicProcedure,
 } from "@/server/api/trpc";
 import { Game } from "@prisma/client";
-import { createPlaylistSchema } from "@/shared/schemas/playlist";
+import { createRoutineSchema } from "@/shared/schemas/routine";
 import { auth } from "@/server/auth";
 import { TRPCError } from "@trpc/server";
 
-export const playlistRouter = createTRPCRouter({
+export const routineRouter = createTRPCRouter({
   getAll: publicProcedure
     .input(z.object({ text: z.string().optional() }))
     .query(async ({ ctx, input }) => {
       const userId = ctx.session?.user.id;
 
-      const playlists = await ctx.db.playlist.findMany({
+      const routines = await ctx.db.routine.findMany({
         include: {
           _count: {
             select: {
@@ -32,51 +32,49 @@ export const playlistRouter = createTRPCRouter({
       });
 
       // TODO: Extremely high performance code
-      const playlistsSortedByLikes = playlists.sort(
+      const routinesSortedByLikes = routines.sort(
         (a, b) => b._count.likedByUsers - a._count.likedByUsers,
       );
 
       if (userId) {
-        const playlistsWithMyOwnLike = playlistsSortedByLikes.map(
-          (playlist) => ({
-            id: playlist.id,
-            title: playlist.title,
-            author: playlist.author,
-            authorHandle: playlist.authorHandle,
-            reference: playlist.reference,
-            description: playlist.description,
-            externalResource: playlist.externalResource,
-            game: playlist.game,
-            likes: playlist._count.likedByUsers,
-            liked: playlist.likedByUsers.find(
-              (likedByUser) => likedByUser.userId === userId,
-            )
-              ? true
-              : false,
-          }),
-        );
+        const routinesWithMyOwnLike = routinesSortedByLikes.map((routine) => ({
+          id: routine.id,
+          title: routine.title,
+          author: routine.author,
+          authorHandle: routine.authorHandle,
+          reference: routine.reference,
+          description: routine.description,
+          externalResource: routine.externalResource,
+          game: routine.game,
+          likes: routine._count.likedByUsers,
+          liked: routine.likedByUsers.find(
+            (likedByUser) => likedByUser.userId === userId,
+          )
+            ? true
+            : false,
+        }));
 
-        return playlistsWithMyOwnLike;
+        return routinesWithMyOwnLike;
       }
 
-      return playlistsSortedByLikes.map((playlist) => ({
-        id: playlist.id,
-        title: playlist.title,
-        author: playlist.author,
-        authorHandle: playlist.authorHandle,
-        reference: playlist.reference,
-        description: playlist.description,
-        externalResource: playlist.externalResource,
-        game: playlist.game,
-        likes: playlist._count.likedByUsers,
+      return routinesSortedByLikes.map((routine) => ({
+        id: routine.id,
+        title: routine.title,
+        author: routine.author,
+        authorHandle: routine.authorHandle,
+        reference: routine.reference,
+        description: routine.description,
+        externalResource: routine.externalResource,
+        game: routine.game,
+        likes: routine._count.likedByUsers,
         liked: false,
       }));
     }),
 
   create: privilegedModeratorProcedure
-    .input(createPlaylistSchema)
+    .input(createRoutineSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.playlist.create({
+      return ctx.db.routine.create({
         data: {
           author: input.author,
           authorHandle: input.authorHandle,
@@ -90,42 +88,42 @@ export const playlistRouter = createTRPCRouter({
       });
     }),
   toggleLike: protectedProcedure
-    .input(z.object({ playlistId: z.string() }))
+    .input(z.object({ routineId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      const { playlistId } = input;
+      const { routineId } = input;
 
-      // Does this playlist exist?
-      const playlist = await ctx.db.playlist.findUnique({
+      // Does this routine exist?
+      const routine = await ctx.db.routine.findUnique({
         where: {
-          id: playlistId,
+          id: routineId,
         },
         include: {
           likedByUsers: true,
         },
       });
 
-      if (!playlist) {
+      if (!routine) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
       // Did we already like it?
-      const likedByUser = playlist.likedByUsers.find(
+      const likedByUser = routine.likedByUsers.find(
         (likedByUser) => likedByUser.userId === userId,
       );
 
       // If we already liked it, remove the like. Otherwise, add it.
       if (likedByUser) {
-        await ctx.db.playlistLiked.delete({
+        await ctx.db.routineLiked.delete({
           where: {
-            playlistId_userId: { playlistId, userId },
+            routineId_userId: { routineId, userId },
           },
         });
       } else {
-        await ctx.db.playlistLiked.create({
+        await ctx.db.routineLiked.create({
           data: {
             user: { connect: { id: userId } },
-            playlist: { connect: { id: playlistId } },
+            routine: { connect: { id: routineId } },
           },
         });
       }

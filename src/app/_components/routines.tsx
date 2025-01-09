@@ -13,7 +13,7 @@ import {
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 import { api } from "@/trpc/react";
-import { Game, Playlist } from "@prisma/client";
+import { Game, Routine } from "@prisma/client";
 import { DataTable } from "@/components/ui/data-table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -26,30 +26,30 @@ import {
 
 import { useToast } from "@/hooks/use-toast";
 import { capitalize } from "@/lib/utils";
-import { PlaylistWithLikes } from "@/shared/types/playlist";
+import { RoutineWithLikes } from "@/shared/types/routine";
 import { User } from "next-auth";
 
-type PlaylistsProps = {
+type RoutinesProps = {
   user: User | null | undefined;
 };
 
-export function Playlists({ user }: PlaylistsProps) {
+export function Routines({ user }: RoutinesProps) {
   const { toast } = useToast();
 
   const utils = api.useUtils();
 
-  const [playlists] = api.playlist.getAll.useSuspenseQuery({});
+  const [routines] = api.routine.getAll.useSuspenseQuery({});
 
-  const toggleLike = api.playlist.toggleLike.useMutation({
+  const toggleLike = api.routine.toggleLike.useMutation({
     onSuccess: async () => {
-      await utils.playlist.invalidate();
+      await utils.routine.invalidate();
     },
   });
 
-  const columns: ColumnDef<PlaylistWithLikes>[] = [
+  const columns: ColumnDef<RoutineWithLikes>[] = [
     {
       accessorKey: "likes",
-      accessorFn: (playlist) => playlist.likes,
+      accessorFn: (routine) => routine.likes,
       header: ({ column }) => {
         const isSorted = column.getIsSorted();
 
@@ -305,7 +305,7 @@ export function Playlists({ user }: PlaylistsProps) {
             className="p-0 font-medium text-primary-foreground"
             onClick={() => {
               toggleLike.mutate({
-                playlistId: row.original.id,
+                routineId: row.original.id,
               });
             }}
             disabled={toggleLike.isPending}
@@ -319,10 +319,10 @@ export function Playlists({ user }: PlaylistsProps) {
 
   return (
     <div className="w-full max-w-7xl">
-      {playlists ? (
-        <DataTable columns={columns} data={playlists} />
+      {routines ? (
+        <DataTable columns={columns} data={routines} />
       ) : (
-        <p>There are no playlists yet.</p>
+        <p>There are no routines yet.</p>
       )}
     </div>
   );

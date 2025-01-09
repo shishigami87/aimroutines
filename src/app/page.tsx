@@ -11,8 +11,8 @@ import {
 
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
-import { Playlists } from "./_components/playlists";
-import { CreatePlaylistForm } from "./_components/createPlaylistForm";
+import { Routines } from "./_components/routines";
+import { CreateRoutineForm } from "./_components/createRoutineForm";
 import { Toaster } from "@/components/ui/toaster";
 
 export default async function Home() {
@@ -27,7 +27,7 @@ export default async function Home() {
           </h1>
         </div>
         <div className="mb-[calc(74px+2rem)] flex flex-1 items-center justify-center">
-          <Playlists user={session?.user} />
+          <Routines user={session?.user} />
         </div>
         {/* Extra mobile-friendly */}
         <div className="fixed bottom-0 z-50 flex h-[74px] items-center justify-center">
@@ -106,7 +106,7 @@ export default async function Home() {
             </Button>
           </div>
         </div>
-        {session?.user.isModerator && <CreatePlaylistForm />}
+        {session?.user.isModerator && <CreateRoutineForm />}
       </main>
       <Toaster />
     </HydrateClient>

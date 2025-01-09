@@ -1,7 +1,7 @@
-import { Playlist } from "@prisma/client";
+import { Routine } from "@prisma/client";
 
-export type PlaylistWithLikes = Pick<
-  Playlist,
+export type RoutineWithLikes = Pick<
+  Routine,
   | "id"
   | "title"
   | "author"
