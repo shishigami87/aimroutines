@@ -133,7 +133,7 @@ export function Routines({ user }: RoutinesProps) {
           );
         }
 
-        const firstPlaylist = playlists.at(0) as Playlist;
+        const firstPlaylist = playlists.at(0)!;
 
         return (
           <Button
@@ -153,7 +153,7 @@ export function Routines({ user }: RoutinesProps) {
     {
       accessorKey: "title",
       filterFn: (row, columnId, filterValue) => {
-        const query = filterValue.toLowerCase();
+        const query = (filterValue as string).toLowerCase();
         const title = row.original.title.toLowerCase();
         const shareCodes = row.original.playlists
           .map((playlist) => playlist.reference)

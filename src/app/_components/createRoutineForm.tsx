@@ -248,7 +248,7 @@ export function CreateRoutineForm() {
                             <Input placeholder="Enter title" {...field} />
                           </FormControl>
                           <FormDescription>
-                            For example "Bronze" or "Silver"
+                            For example &quot;Bronze&quot; or &quot;Silver&quot;
                           </FormDescription>
                         </FormItem>
                       )}

@@ -119,10 +119,10 @@ export function RoutineTableActions({
                   {routine.game === Game.KOVAAKS &&
                     (routine.playlists.length === 1 ? (
                       <DropdownMenuItem
-                        key={(routine.playlists[0] as Playlist).reference}
+                        key={routine.playlists[0]!.reference}
                         onClick={async () => {
                           await navigator.clipboard.writeText(
-                            (routine.playlists[0] as Playlist).reference,
+                            routine.playlists[0]!.reference,
                           );
                           toast({
                             description: "Sharecode copied to clipboard",
