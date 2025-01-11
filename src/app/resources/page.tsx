@@ -25,10 +25,10 @@ export default async function Home() {
             AimRoutines.fyi
           </h1>
           <div className="absolute flex flex-col">
-            <a href="/">&raquo; routines</a>
-            <a href="#" className="text-rose-200">
+            <Link href="/">&raquo; routines</Link>
+            <Link href="#" className="text-rose-200">
               &raquo; resources
-            </a>
+            </Link>
           </div>
         </div>
         <div className="mb-[calc(74px+2rem)] flex w-full max-w-4xl flex-1 items-center justify-center">
