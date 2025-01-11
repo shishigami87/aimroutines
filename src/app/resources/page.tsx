@@ -11,9 +11,8 @@ import {
 
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
-import { Routines } from "./_components/routines";
-import { CreateRoutineForm } from "./_components/createRoutineForm";
 import { Toaster } from "@/components/ui/toaster";
+import { Crosshairs } from "../_components/crosshairs";
 
 export default async function Home() {
   const session = await auth();
@@ -26,14 +25,14 @@ export default async function Home() {
             AimRoutines.fyi
           </h1>
           <div className="absolute flex flex-col">
+            <a href="/">&raquo; routines</a>
             <a href="#" className="text-rose-200">
-              &raquo; routines
+              &raquo; resources
             </a>
-            <a href="/resources">&raquo; resources</a>
           </div>
         </div>
         <div className="mb-[calc(74px+2rem)] flex w-full max-w-4xl flex-1 items-center justify-center">
-          <Routines user={session?.user} />
+          <Crosshairs />
         </div>
         {/* Extra mobile-friendly */}
         <div className="fixed bottom-0 z-50 flex h-[74px] items-center justify-center">
@@ -112,7 +111,6 @@ export default async function Home() {
             </Button>
           </div>
         </div>
-        {session?.user.isModerator && <CreateRoutineForm />}
       </main>
       <Toaster />
     </HydrateClient>

@@ -57,6 +57,7 @@ model User {
 
     likedRoutines       RoutineLiked[]
     benchmarkedRoutines RoutineBenchmark[]
+    likedResources      ResourceLiked[]
 }
 
 model VerificationToken {
@@ -134,4 +135,47 @@ model Playlist {
 enum Game {
     KOVAAKS
     AIMLABS
+}
+
+enum ResourceType {
+    CROSSHAIR
+    THEME
+    SOUND
+}
+
+model Resource {
+    hash String       @id
+    url  String
+    type ResourceType
+
+    likedByUsers ResourceLiked[]
+
+    createdAt           DateTime              @default(now())
+    updatedAt           DateTime              @updatedAt
+    ResourceLikedTwitch ResourceLikedTwitch[]
+}
+
+model ResourceLiked {
+    resource     Resource @relation(fields: [resourceHash], references: [hash])
+    resourceHash String
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+
+    likedAt   DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@id([resourceHash, userId])
+}
+
+model ResourceLikedTwitch {
+    resource     Resource @relation(fields: [resourceHash], references: [hash])
+    resourceHash String
+
+    userId String
+
+    likedAt   DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@id([resourceHash, userId])
 }
