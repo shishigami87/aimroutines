@@ -75,10 +75,23 @@ export const routineRouter = createTRPCRouter({
           where: {
             id: {
               in: [
-                "cm5igcr6v000goyptyjaphorx",
-                "cm5ig26ik0008oyptcrkphc6u",
-                "cm5l79ku7000a4ns2qd4g798h",
-                "cm5l8bb3m0000sb2dcuj75i53",
+                "cm5igcr6v000goyptyjaphorx", // Voltaic Kovaaks Benchmarks S5 BETA
+                "cm5ig26ik0008oyptcrkphc6u", // Voltaic Aimlabs Benchmarks S3
+                "cm5l79ku7000a4ns2qd4g798h", // Voltaic Kovaaks Fundamentals
+                "cm5l8bb3m0000sb2dcuj75i53", // Voltaic Aimlabs Fundamentals
+                "cm5nwacli0000hqzsbpgficzz", // VDIM for Kovaaks S4 - Dynamic Clicking
+                "cm5nwacli0005hqzslhc3gdpr", // VDIM for Kovaaks S4 - Static Clicking
+                "cm5nwacli000ahqzsrbw4n5k6", // VDIM for Kovaaks S4 - Smooth Tracking
+                "cm5nwacli000fhqzs5f0x2n2o", // VDIM for Kovaaks S4 - Reactive Tracking
+                "cm5nwaclj000khqzsh5xfrthj", // VDIM for Kovaaks S4 - Speed TS
+                "cm5nwaclj000phqzsxvqkcnou", // VDIM for Kovaaks S4 - Evasive TS
+                "cm5nwaclj000uhqzsu28uffvs", // VDIM for Kovaaks S4 - Movement Aiming
+                "cm5nx14e70000hq94drpn30t1", // VDIM for Aimlabs S2 - Dynamic Clicking
+                "cm5nx14e70005hq9421i0osho", // VDIM for Aimlabs S2 - Static Clicking
+                "cm5nx14e7000ahq94s0u8vkhh", // VDIM for Aimlabs S2 - Precise Tracking
+                "cm5nx14e7000fhq94ewdo99cr", // VDIM for Aimlabs S2 - Reactive Tracking
+                "cm5nx14e7000khq946d4d02cy", // VDIM for Aimlabs S2 - Speed TS
+                "cm5nx14e7000phq942b5onmda", // VDIM for Aimlabs S2 - Evasive TS
               ],
             },
           },
