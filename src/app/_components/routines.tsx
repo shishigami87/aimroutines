@@ -38,6 +38,7 @@ import { RoutineData } from "@/shared/types/routine";
 import { User } from "next-auth";
 import { RoutineTableActions } from "./routineTableActions";
 import { Strategy } from "@/lib/constants";
+import { sortPlaylistsByDifficulty } from "@/lib/sorting";
 
 type RoutinesProps = {
   user: User | null | undefined;
@@ -94,7 +95,9 @@ export function Routines({ user }: RoutinesProps) {
       accessorKey: "actionsPlay",
       header: "",
       cell: ({ row }) => {
-        const playlists = row.original.playlists;
+        const playlists = row.original.playlists.sort(
+          sortPlaylistsByDifficulty,
+        );
         const game = row.original.game;
 
         if (playlists.length < 1) {
