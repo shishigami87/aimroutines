@@ -8,6 +8,7 @@ import {
   DotsHorizontalIcon,
   Link1Icon,
   LinkBreak1Icon,
+  Share1Icon,
 } from "@radix-ui/react-icons";
 import {
   Dialog,
@@ -56,11 +57,6 @@ export function RoutineTableActions({
 
   const { toast } = useToast();
 
-  const showActionsButton =
-    routine.game === Game.KOVAAKS || // We can copy the share code
-    routine.externalResource || // We can view the source/benchmark
-    routine.isBenchmark; // We can manage the benchmark sheet
-
   const addBenchmark = api.routine.addBenchmark.useMutation({
     onSuccess: async () => {
       await utils.routine.invalidate();
@@ -99,126 +95,138 @@ export function RoutineTableActions({
 
   return (
     <>
-      {showActionsButton && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0 hover:bg-zinc-700 hover:text-white"
-            >
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="right">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {(routine.game === Game.KOVAAKS || routine.externalResource) && (
-              <>
-                <DropdownMenuGroup>
-                  {routine.game === Game.KOVAAKS &&
-                    (routine.playlists.length === 1 ? (
-                      <DropdownMenuItem
-                        key={routine.playlists[0]!.reference}
-                        onClick={async () => {
-                          await navigator.clipboard.writeText(
-                            routine.playlists[0]!.reference,
-                          );
-                          toast({
-                            description: "Sharecode copied to clipboard",
-                          });
-                        }}
-                      >
-                        Copy share code
-                        <div className="ml-auto">
-                          <CopyIcon />
-                        </div>
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                          Copy share code
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                          <DropdownMenuSubContent>
-                            {routine.playlists.map((playlist) => (
-                              <DropdownMenuItem
-                                key={playlist.reference}
-                                onClick={async () => {
-                                  await navigator.clipboard.writeText(
-                                    playlist.reference,
-                                  );
-                                  toast({
-                                    description:
-                                      "Sharecode copied to clipboard",
-                                  });
-                                }}
-                              >
-                                {playlist.title}
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                      </DropdownMenuSub>
-                    ))}
-                  {routine.externalResource && (
-                    <DropdownMenuItem asChild>
-                      <Link href={routine.externalResource} target="_blank">
-                        {routine.isBenchmark
-                          ? "Open template sheet"
-                          : "View source"}
-                        <div className="ml-auto">
-                          <OpenInNewWindowIcon />
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuGroup>
-                {routine.isBenchmark && <DropdownMenuSeparator />}
-              </>
-            )}
-            {routine.isBenchmark && (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="h-8 w-8 p-0 hover:bg-zinc-700 hover:text-white"
+          >
+            <span className="sr-only">Open menu</span>
+            <DotsHorizontalIcon className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" side="right">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {(routine.game === Game.KOVAAKS || routine.externalResource) && (
+            <>
               <DropdownMenuGroup>
-                {routine.benchmarkSheet ? (
-                  <>
-                    <DropdownMenuItem disabled={!user} asChild>
-                      <Link href={routine.benchmarkSheet} target="_blank">
-                        Open my score sheet
-                        <div className="ml-auto">
-                          <OpenInNewWindowIcon />
-                        </div>
-                      </Link>
-                    </DropdownMenuItem>
+                {routine.game === Game.KOVAAKS &&
+                  (routine.playlists.length === 1 ? (
                     <DropdownMenuItem
-                      disabled={!user}
-                      onClick={() => {
-                        setIsRemoveDialogOpen(true);
+                      key={routine.playlists[0]!.reference}
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(
+                          routine.playlists[0]!.reference,
+                        );
+                        toast({
+                          description: "Sharecode copied to clipboard",
+                        });
                       }}
                     >
-                      Remove score sheet
+                      Copy share code
                       <div className="ml-auto">
-                        <LinkBreak1Icon />
+                        <CopyIcon />
                       </div>
                     </DropdownMenuItem>
-                  </>
-                ) : (
+                  ) : (
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>
+                        Copy share code
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                          {routine.playlists.map((playlist) => (
+                            <DropdownMenuItem
+                              key={playlist.reference}
+                              onClick={async () => {
+                                await navigator.clipboard.writeText(
+                                  playlist.reference,
+                                );
+                                toast({
+                                  description: "Sharecode copied to clipboard",
+                                });
+                              }}
+                            >
+                              {playlist.title}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  ))}
+                {routine.externalResource && (
+                  <DropdownMenuItem asChild>
+                    <Link href={routine.externalResource} target="_blank">
+                      {routine.isBenchmark
+                        ? "Open template sheet"
+                        : "View source"}
+                      <div className="ml-auto">
+                        <OpenInNewWindowIcon />
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(
+                      `${window.location.origin}/#${routine.id}`,
+                    );
+                    toast({
+                      description: "URL copied to clipboard",
+                    });
+                  }}
+                >
+                  Share routine
+                  <div className="ml-auto">
+                    <Share1Icon />
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              {routine.isBenchmark && <DropdownMenuSeparator />}
+            </>
+          )}
+          {routine.isBenchmark && (
+            <DropdownMenuGroup>
+              {routine.benchmarkSheet ? (
+                <>
+                  <DropdownMenuItem disabled={!user} asChild>
+                    <Link href={routine.benchmarkSheet} target="_blank">
+                      Open my score sheet
+                      <div className="ml-auto">
+                        <OpenInNewWindowIcon />
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled={!user}
                     onClick={() => {
-                      setIsCreateDialogOpen(true);
+                      setIsRemoveDialogOpen(true);
                     }}
                   >
-                    Add score sheet
+                    Remove score sheet
                     <div className="ml-auto">
-                      <Link1Icon />
+                      <LinkBreak1Icon />
                     </div>
                   </DropdownMenuItem>
-                )}
-              </DropdownMenuGroup>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+                </>
+              ) : (
+                <DropdownMenuItem
+                  disabled={!user}
+                  onClick={() => {
+                    setIsCreateDialogOpen(true);
+                  }}
+                >
+                  Add score sheet
+                  <div className="ml-auto">
+                    <Link1Icon />
+                  </div>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuGroup>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Dialog
         open={isCreateDialogOpen}
         onOpenChange={(open) => {

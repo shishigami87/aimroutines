@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect, useEffect } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { User } from "next-auth";
 
@@ -32,18 +32,22 @@ import {
 } from "@/components/ui/select";
 import { Input } from "./input";
 import { Strategy } from "@/lib/constants";
+import { RoutineData } from "@/shared/types/routine";
+import clsx from "clsx";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   user: User | null | undefined;
+  highlightedRowId: string | undefined;
   onStrategyChange?: (newStrategy: Strategy) => void;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: string }, TValue>({
   columns,
   data,
   user,
+  highlightedRowId,
   onStrategyChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -57,6 +61,7 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    getRowId: (row) => row.id,
     state: {
       sorting,
       columnFilters,
@@ -73,6 +78,15 @@ export function DataTable<TData, TValue>({
   useLayoutEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (highlightedRowId) {
+      const row = table.getRow(highlightedRowId);
+      if (row) {
+        document.getElementById(highlightedRowId)?.scrollIntoView();
+      }
+    }
+  }, [highlightedRowId]);
 
   if (!isMounted) return null;
 
@@ -157,7 +171,8 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-zinc-900"
+                  className={`hover:bg-zinc-900 ${clsx({ "bg-rose-950": row.id === highlightedRowId })}`}
+                  id={row.original.id}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

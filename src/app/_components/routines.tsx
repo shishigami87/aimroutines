@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   PlayIcon,
@@ -39,13 +39,14 @@ import { User } from "next-auth";
 import { RoutineTableActions } from "./routineTableActions";
 import { Strategy } from "@/lib/constants";
 import { sortPlaylistsByDifficulty } from "@/lib/sorting";
+import { useParams } from "next/navigation";
 
 type RoutinesProps = {
   user: User | null | undefined;
 };
 
 export function Routines({ user }: RoutinesProps) {
-  const { toast } = useToast();
+  const params = useParams();
 
   const utils = api.useUtils();
 
@@ -54,6 +55,27 @@ export function Routines({ user }: RoutinesProps) {
   const [routines] = api.routine.getRoutines.useSuspenseQuery({
     strategy,
   });
+
+  const [highlightedRoutine, setHighlightedRoutine] = useState<RoutineData>();
+
+  useEffect(() => {
+    if (!routines) {
+      return;
+    }
+
+    const { hash } = window.location;
+    if (hash.startsWith("#")) {
+      const shareId = hash.substring(1);
+
+      if (shareId.length > 0) {
+        const routine = routines.find((routine) => routine.id === shareId);
+
+        if (routine) {
+          setHighlightedRoutine(routine);
+        }
+      }
+    }
+  }, [params, routines]);
 
   const toggleLike = api.routine.toggleLike.useMutation({
     onSuccess: async () => {
@@ -334,6 +356,7 @@ export function Routines({ user }: RoutinesProps) {
             setStrategy(newStrategy);
           }}
           user={user}
+          highlightedRowId={highlightedRoutine?.id}
         />
       ) : (
         <p>There are no routines yet.</p>
