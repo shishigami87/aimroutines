@@ -3,6 +3,7 @@
 import { useState, useLayoutEffect, useEffect } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { User } from "next-auth";
+import { useSearchParams } from "next/navigation";
 
 import {
   ColumnDef,
@@ -31,7 +32,7 @@ import {
   SelectGroup,
 } from "@/components/ui/select";
 import { Input } from "./input";
-import { Strategy } from "@/lib/constants";
+import { Strategies, Strategy } from "@/lib/constants";
 import { RoutineData } from "@/shared/types/routine";
 import clsx from "clsx";
 
@@ -52,6 +53,11 @@ export function DataTable<TData extends { id: string }, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const searchParams = useSearchParams();
+  const queryFromUrl = searchParams.get("q");
+  const gameFromUrl = searchParams.get("g");
+  const strategyFromUrl = searchParams.get("s");
 
   const table = useReactTable({
     data,
@@ -80,6 +86,28 @@ export function DataTable<TData extends { id: string }, TValue>({
   }, []);
 
   useEffect(() => {
+    if (queryFromUrl) {
+      table.getColumn("title")?.setFilterValue(queryFromUrl);
+    }
+  }, [queryFromUrl]);
+
+  useEffect(() => {
+    if (gameFromUrl) {
+      table.getColumn("game")?.setFilterValue(gameFromUrl.toUpperCase());
+    }
+  }, [gameFromUrl]);
+
+  useEffect(() => {
+    if (strategyFromUrl) {
+      onStrategyChange?.(
+        strategyFromUrl in Strategies
+          ? (strategyFromUrl as Strategy)
+          : "all-routines",
+      );
+    }
+  }, [strategyFromUrl]);
+
+  useEffect(() => {
     if (highlightedRowId) {
       const row = table.getRow(highlightedRowId);
       if (row) {
@@ -96,10 +124,12 @@ export function DataTable<TData extends { id: string }, TValue>({
         <Input
           autoComplete="off"
           placeholder="Filter by title or share code"
+          defaultValue={queryFromUrl ?? ""}
           onChange={(event) => debouncedOnChange(event.target.value)}
           className="max-w-sm"
         />
         <Select
+          defaultValue={gameFromUrl?.toUpperCase() ?? undefined}
           onValueChange={(value) => {
             if (value === "ANY") {
               table.getColumn("game")?.setFilterValue(undefined);
@@ -119,7 +149,7 @@ export function DataTable<TData extends { id: string }, TValue>({
         </Select>
         <div className="flex-1"></div>
         <Select
-          defaultValue="all-routines"
+          defaultValue={strategyFromUrl ?? "all-routines"}
           onValueChange={(value) => {
             onStrategyChange?.(value as Strategy);
           }}
