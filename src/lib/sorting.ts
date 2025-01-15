@@ -63,6 +63,22 @@ const DIFFULTY_ORDER: Record<string, number> = {
   // Intermediate: 2
   // Advanced: 3
   "Advanced Plus": 4,
+
+  // Deadman's Benchmarks
+  "Level 1": 0,
+  "Level 1 Pokeball": 1,
+  "Level 2": 2,
+  "Level 2 Pokeball": 3,
+  "Level 3": 4,
+  "Level 3 Pokeball": 5,
+  "Level 4": 6,
+  "Level 4 Pokeball": 7,
+  Boss: 8,
+  "Boss Pokeball": 9,
+  "Boss+": 10,
+  "Boss+ Pokeball": 11,
+  "Boss++": 12,
+  "Boss++ Pokeball": 13,
 } as const;
 
 export function sortPlaylistsByDifficulty(a: Playlist, b: Playlist) {
