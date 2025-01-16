@@ -185,7 +185,10 @@ export function Routines({ user }: RoutinesProps) {
           .join()
           .toLowerCase();
 
-        return title.includes(query) || shareCodes.includes(query);
+        return (
+          title.includes(query) ||
+          (query.startsWith("kovaaks") && shareCodes.includes(query)) // only check for a matching share code if the query starts with "kovaaks" to avoid false positives
+        );
       },
       header: ({ column }) => {
         const isSorted = column.getIsSorted();
