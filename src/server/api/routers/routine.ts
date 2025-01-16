@@ -15,7 +15,7 @@ export const routineRouter = createTRPCRouter({
       z.object({
         strategy: z.enum([
           "all-routines",
-          "recommend-beginners",
+          "beginner-recommendations",
           "liked-routines",
           "only-benchmarks",
           "active-benchmarks",
@@ -71,7 +71,7 @@ export const routineRouter = createTRPCRouter({
             },
           },
         }),
-        ...(strategy === "recommend-beginners" && {
+        ...(strategy === "beginner-recommendations" && {
           where: {
             id: {
               in: [

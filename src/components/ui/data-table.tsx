@@ -35,6 +35,9 @@ import { Input } from "./input";
 import { Strategies, Strategy } from "@/lib/constants";
 import { RoutineData } from "@/shared/types/routine";
 import clsx from "clsx";
+import { Button } from "./button";
+import { Share1Icon } from "@radix-ui/react-icons";
+import { useToast } from "@/hooks/use-toast";
 
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -54,10 +57,16 @@ export function DataTable<TData extends { id: string }, TValue>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
+  const { toast } = useToast();
+
   const searchParams = useSearchParams();
   const queryFromUrl = searchParams.get("q");
   const gameFromUrl = searchParams.get("g");
   const strategyFromUrl = searchParams.get("s");
+
+  const [strategy, setStrategy] = useState<Strategy>(
+    strategyFromUrl ? (strategyFromUrl as Strategy) : "all-routines",
+  );
 
   const table = useReactTable({
     data,
@@ -149,8 +158,10 @@ export function DataTable<TData extends { id: string }, TValue>({
         </Select>
         <div className="flex-1"></div>
         <Select
+          value={strategy}
           defaultValue={strategyFromUrl ?? "all-routines"}
           onValueChange={(value) => {
+            setStrategy(value as Strategy);
             onStrategyChange?.(value as Strategy);
           }}
         >
@@ -162,7 +173,7 @@ export function DataTable<TData extends { id: string }, TValue>({
             {user && (
               <SelectItem value="liked-routines">Liked routines</SelectItem>
             )}
-            <SelectItem value="recommend-beginners">
+            <SelectItem value="beginner-recommendations">
               Beginner routines
             </SelectItem>
             <SelectItem value="only-benchmarks">Only benchmarks</SelectItem>
@@ -175,7 +186,7 @@ export function DataTable<TData extends { id: string }, TValue>({
           </SelectContent>
         </Select>
       </div>
-      <div className="max-h-[calc(100vh-212px-68px)] overflow-y-auto rounded-md border">
+      <div className="max-h-[calc(100vh-212px-68px-60px)] overflow-y-auto rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -226,6 +237,41 @@ export function DataTable<TData extends { id: string }, TValue>({
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex items-center justify-end py-2">
+        <Button
+          variant="link"
+          size="sm"
+          className="px-0 text-primary-foreground"
+          onClick={async () => {
+            const titleFilter = table
+              .getColumn("title")
+              ?.getFilterValue() as string;
+            const gameFilter = table
+              .getColumn("game")
+              ?.getFilterValue() as string;
+
+            const urlParams = new URLSearchParams();
+            if (titleFilter) urlParams.set("q", titleFilter);
+            if (gameFilter) urlParams.set("g", gameFilter.toLowerCase());
+            if (strategy !== "all-routines") urlParams.set("s", strategy);
+
+            if (urlParams.size > 0) {
+              await navigator.clipboard.writeText(
+                `${window.location.origin}/?${urlParams.toString()}`,
+              );
+            } else {
+              await navigator.clipboard.writeText(window.location.origin);
+            }
+
+            toast({
+              description: "URL copied to clipboard",
+            });
+          }}
+        >
+          Share results
+          <Share1Icon />
+        </Button>
       </div>
     </div>
   );
