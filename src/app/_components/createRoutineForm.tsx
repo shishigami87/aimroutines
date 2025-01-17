@@ -59,6 +59,7 @@ export function CreateRoutineForm() {
       game: Game.KOVAAKS,
       playlists: [],
       externalResource: "",
+      templateSheet: "",
       isBenchmark: false,
     },
   });
@@ -222,7 +223,8 @@ export function CreateRoutineForm() {
                       <Input placeholder="Enter URL" {...field} />
                     </FormControl>
                     <FormDescription>
-                      Any external resources the routine may have
+                      Any external resources the routine may have, like a video
+                      or document
                     </FormDescription>
                   </FormItem>
                 )}
@@ -320,6 +322,24 @@ export function CreateRoutineForm() {
                   </FormItem>
                 )}
               />
+              {form.getValues().isBenchmark && (
+                <FormField
+                  control={form.control}
+                  name="templateSheet"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Template sheet</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter URL" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        For benchmarks, enter the URL to the benchmark template
+                        sheet
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <SheetFooter className="mt-4">
                 <SheetClose asChild>

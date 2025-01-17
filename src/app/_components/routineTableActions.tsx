@@ -111,6 +111,16 @@ export function RoutineTableActions({
           {(routine.game === Game.KOVAAKS || routine.externalResource) && (
             <>
               <DropdownMenuGroup>
+                {routine.externalResource && (
+                  <DropdownMenuItem asChild>
+                    <Link href={routine.externalResource} target="_blank">
+                      Open README
+                      <div className="ml-auto">
+                        <OpenInNewWindowIcon />
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 {routine.game === Game.KOVAAKS &&
                   (routine.playlists.length === 1 ? (
                     <DropdownMenuItem
@@ -155,76 +165,79 @@ export function RoutineTableActions({
                       </DropdownMenuPortal>
                     </DropdownMenuSub>
                   ))}
-                {routine.externalResource && (
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          {routine.isBenchmark && (
+            <>
+              <DropdownMenuGroup>
+                {routine.templateSheet && (
                   <DropdownMenuItem asChild>
-                    <Link href={routine.externalResource} target="_blank">
-                      {routine.isBenchmark
-                        ? "Open template sheet"
-                        : "View source"}
+                    <Link href={routine.templateSheet} target="_blank">
+                      Open template sheet
                       <div className="ml-auto">
                         <OpenInNewWindowIcon />
                       </div>
                     </Link>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem
-                  onClick={async () => {
-                    await navigator.clipboard.writeText(
-                      `${window.location.origin}/#${routine.id}`,
-                    );
-                    toast({
-                      description: "URL copied to clipboard",
-                    });
-                  }}
-                >
-                  Share routine
-                  <div className="ml-auto">
-                    <Share1Icon />
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              {routine.isBenchmark && <DropdownMenuSeparator />}
-            </>
-          )}
-          {routine.isBenchmark && (
-            <DropdownMenuGroup>
-              {routine.benchmarkSheet ? (
-                <>
-                  <DropdownMenuItem disabled={!user} asChild>
-                    <Link href={routine.benchmarkSheet} target="_blank">
-                      Open my score sheet
+                {routine.benchmarkSheet ? (
+                  <>
+                    <DropdownMenuItem disabled={!user} asChild>
+                      <Link href={routine.benchmarkSheet} target="_blank">
+                        Open my score sheet
+                        <div className="ml-auto">
+                          <OpenInNewWindowIcon />
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      disabled={!user}
+                      onClick={() => {
+                        setIsRemoveDialogOpen(true);
+                      }}
+                    >
+                      Remove score sheet
                       <div className="ml-auto">
-                        <OpenInNewWindowIcon />
+                        <LinkBreak1Icon />
                       </div>
-                    </Link>
-                  </DropdownMenuItem>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
                   <DropdownMenuItem
                     disabled={!user}
                     onClick={() => {
-                      setIsRemoveDialogOpen(true);
+                      setIsCreateDialogOpen(true);
                     }}
                   >
-                    Remove score sheet
+                    Add score sheet
                     <div className="ml-auto">
-                      <LinkBreak1Icon />
+                      <Link1Icon />
                     </div>
                   </DropdownMenuItem>
-                </>
-              ) : (
-                <DropdownMenuItem
-                  disabled={!user}
-                  onClick={() => {
-                    setIsCreateDialogOpen(true);
-                  }}
-                >
-                  Add score sheet
-                  <div className="ml-auto">
-                    <Link1Icon />
-                  </div>
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuGroup>
+                )}
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+            </>
           )}
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              onClick={async () => {
+                await navigator.clipboard.writeText(
+                  `${window.location.origin}/#${routine.id}`,
+                );
+                toast({
+                  description: "URL copied to clipboard",
+                });
+              }}
+            >
+              Share routine
+              <div className="ml-auto">
+                <Share1Icon />
+              </div>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
       <Dialog

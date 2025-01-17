@@ -8,6 +8,7 @@ export type RoutineData = Pick<
   | "authorHandle"
   | "description"
   | "externalResource"
+  | "templateSheet"
   | "game"
   | "isBenchmark"
 > & {
