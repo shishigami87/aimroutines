@@ -18,6 +18,8 @@ import { Toaster } from "@/components/ui/toaster";
 export default async function Home() {
   const session = await auth();
 
+  void api.routine.getRoutines.prefetch({ strategy: "all-routines" });
+
   return (
     <HydrateClient>
       <main className="flex min-h-screen flex-col items-center bg-zinc-950 text-white">
