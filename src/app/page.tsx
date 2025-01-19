@@ -19,6 +19,10 @@ export default async function Home() {
   const session = await auth();
 
   void api.routine.getRoutines.prefetch({ strategy: "all-routines" });
+  void api.routine.getRoutines.prefetch({
+    strategy: "beginner-recommendations",
+  });
+  void api.routine.getRoutines.prefetch({ strategy: "benchmarks" });
 
   return (
     <HydrateClient>

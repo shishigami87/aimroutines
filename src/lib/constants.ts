@@ -8,11 +8,10 @@
 
 export const Strategies = {
   ["all-routines"]: "All routines",
-  ["beginner-recommendations"]: "Beginner routines",
   ["liked-routines"]: "Liked routines",
-  ["only-benchmarks"]: "Only benchmarks",
+  ["beginner-recommendations"]: "Beginner routines",
+  ["benchmarks"]: "Benchmarks",
   ["active-benchmarks"]: "Active benchmarks",
-  ["no-benchmarks"]: "No benchmarks",
 } as const;
 
 export type Strategy = keyof typeof Strategies;

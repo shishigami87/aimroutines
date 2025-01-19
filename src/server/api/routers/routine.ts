@@ -17,9 +17,8 @@ export const routineRouter = createTRPCRouter({
           "all-routines",
           "beginner-recommendations",
           "liked-routines",
-          "only-benchmarks",
+          "benchmarks",
           "active-benchmarks",
-          "no-benchmarks",
         ]),
       }),
     )
@@ -42,12 +41,12 @@ export const routineRouter = createTRPCRouter({
         orderBy: {
           title: "desc",
         },
-        ...(strategy === "no-benchmarks" && {
+        ...(strategy === "all-routines" && {
           where: {
             isBenchmark: false,
           },
         }),
-        ...(strategy === "only-benchmarks" && {
+        ...(strategy === "benchmarks" && {
           where: {
             isBenchmark: true,
           },

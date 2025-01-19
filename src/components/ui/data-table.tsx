@@ -176,13 +176,12 @@ export function DataTable<TData extends { id: string }, TValue>({
             <SelectItem value="beginner-recommendations">
               Beginner routines
             </SelectItem>
-            <SelectItem value="only-benchmarks">Only benchmarks</SelectItem>
+            <SelectItem value="benchmarks">Benchmarks</SelectItem>
             {user && (
               <SelectItem value="active-benchmarks">
                 Active benchmarks
               </SelectItem>
             )}
-            <SelectItem value="no-benchmarks">No benchmarks</SelectItem>
           </SelectContent>
         </Select>
       </div>
