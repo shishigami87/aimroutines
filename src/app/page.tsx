@@ -83,7 +83,7 @@ export default async function Home() {
               size="icon"
               className="text-primary-foreground"
             >
-              <Link href="https://discord.gg/VafXRyC4zz" target="_blank">
+              <Link href="https://discord.gg/nEGEYnA6tS" target="_blank">
                 <DiscordLogoIcon />
               </Link>
             </Button>
