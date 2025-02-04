@@ -165,6 +165,43 @@ export function RoutineTableActions({
                       </DropdownMenuPortal>
                     </DropdownMenuSub>
                   ))}
+                {routine.game === Game.KOVAAKS &&
+                  (routine.playlists.length === 1 ? (
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={`https://kovaaks.com/kovaaks/playlists?search=${routine.playlists[0]!.reference}`}
+                        target="_blank"
+                      >
+                        View playlist
+                        <div className="ml-auto">
+                          <OpenInNewWindowIcon />
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>
+                        View playlist
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                          {routine.playlists.map((playlist) => (
+                            <DropdownMenuItem asChild key={playlist.reference}>
+                              <Link
+                                href={`https://kovaaks.com/kovaaks/playlists?search=${playlist.reference}`}
+                                target="_blank"
+                              >
+                                {playlist.title}
+                                <div className="ml-auto">
+                                  <OpenInNewWindowIcon />
+                                </div>
+                              </Link>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  ))}
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
             </>
