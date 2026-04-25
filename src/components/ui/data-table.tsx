@@ -154,6 +154,7 @@ export function DataTable<TData extends { id: string }, TValue>({
             <SelectItem value="ANY">--- Any ---</SelectItem>
             <SelectItem value="KOVAAKS">Kovaaks</SelectItem>
             <SelectItem value="AIMLABS">Aimlabs</SelectItem>
+            <SelectItem value="AIMBEAST">Aimbeast</SelectItem>
           </SelectContent>
         </Select>
         <div className="flex-1"></div>

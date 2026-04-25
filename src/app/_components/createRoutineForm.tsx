@@ -266,7 +266,9 @@ export function CreateRoutineForm() {
                               placeholder={
                                 form.getValues().game === Game.KOVAAKS
                                   ? "Enter share code"
-                                  : "Enter URL"
+                                  : form.getValues().game === Game.AIMBEAST
+                                    ? "Enter scenario id"
+                                    : "Enter URL"
                               }
                               {...field}
                             />
@@ -274,7 +276,9 @@ export function CreateRoutineForm() {
                           <FormDescription>
                             {form.getValues().game === Game.KOVAAKS
                               ? "The share code to add this routine in Kovaaks"
-                              : "The URL to open this routine in Aimlabs"}
+                              : form.getValues().game === Game.AIMBEAST
+                                ? "The scenario id to open this routine in Aimbeast"
+                                : "The URL to open this routine in Aimlabs"}
                           </FormDescription>
                         </FormItem>
                       )}

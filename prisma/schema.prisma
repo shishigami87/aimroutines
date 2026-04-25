@@ -135,4 +135,5 @@ model Playlist {
 enum Game {
     KOVAAKS
     AIMLABS
+    AIMBEAST
 }
